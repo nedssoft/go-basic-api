@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	db, err := database.NewMySQLStorage(config.GetConnectionString())
+	db, err := database.NewDB(config.GetConnectionString())
 	if err != nil {
 	 log.Fatal(err)
 	} 
