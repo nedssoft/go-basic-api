@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewMySQLStorage(connString string) (*gorm.DB, error) {
+func NewDB(connString string) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(connString), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
