@@ -1,4 +1,4 @@
-# Learn Go API
+# Go BASIC API
 
 This project is a RESTful API built with Go, using Gin as the web framework and GORM for database operations.
 
@@ -19,8 +19,8 @@ This project is a RESTful API built with Go, using Gin as the web framework and 
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/learn-go.git
-   cd learn-go
+   git clone https://github.com/nedssoft/go-basic-api.git
+   cd go-basic-api
    ```
 
 2. Install dependencies:

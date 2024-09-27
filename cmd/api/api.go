@@ -31,10 +31,8 @@ func (s *APIServer) Run() error {
 	})
 	subrouter := router.Group("/api/v1")
 
-	postRoute := routes.NewPostRoutes(subrouter, s.db)
-	postRoute.RegisterRoutes()
-	userRoute := routes.NewUserRoutes(subrouter, s.db)
-	userRoute.RegisterUserRoutes()
+	routes := routes.NewRoutes(subrouter, s.db)
+	routes.RegisterRoutes()
 	log.Println("Server running on port: ", s.addr)
 	return router.Run()
 }

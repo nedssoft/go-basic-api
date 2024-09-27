@@ -21,9 +21,10 @@ func NewPostRoutes(router *gin.RouterGroup, db *gorm.DB) *PostRoutes {
 
 func (r *PostRoutes) RegisterRoutes() {
 	postController := controllers.NewPostController(r.db)
+	idRoute := r.router.Group("/posts/:id")
 	r.router.GET("/posts", postController.GetPosts)
-
-	r.router.GET("/posts/:id", postController.GetPost)
-
+	idRoute.GET("", postController.GetPost)
 	r.router.POST("/posts", postController.CreatePost)
+	idRoute.DELETE("", postController.DeletePost)
+	idRoute.PUT("", postController.UpdatePost)
 }

@@ -1,14 +1,9 @@
 package routes
 
 import (
-	"log"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-
-	"github.com/nedssoft/go-basic-api/models"
-	"github.com/nedssoft/go-basic-api/service"
+	"github.com/nedssoft/go-basic-api/controllers"
 )
 
 type UserRoutes struct {
@@ -23,43 +18,12 @@ func NewUserRoutes(router *gin.RouterGroup, db *gorm.DB) *UserRoutes {
 	}
 }
 
-func (r *UserRoutes) RegisterUserRoutes() {
-	userService := service.NewUserService(r.db)
-	r.router.GET("/users/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		user, err := userService.GetUser(id)
-		if err != nil {
-			log.Println(err)
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to get user",
-			})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"user": user,
-		})
-	})
-
-
-	r.router.POST("/users", func(c *gin.Context) {
-		var user models.User
-		if err := c.ShouldBindJSON(&user); err != nil {
-			log.Println(err)
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Failed to bind JSON",
-			})
-			return
-		}
-		log.Println(user)
-		if err := userService.CreateUser(&user); err != nil {
-			log.Println(err)
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to create user",
-			})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{
-			"message": "User created successfully",
-		})
-	})
+func (r *UserRoutes) RegisterRoutes() {
+	userController := controllers.NewUserController(r.db)
+	idRoute := r.router.Group("/users/:id")
+	idRoute.GET("", userController.GetUser)
+	r.router.GET("/users", userController.GetUsers)
+	r.router.POST("/users", userController.CreateUser)
+	idRoute.DELETE("", userController.DeleteUser)
+	idRoute.PUT("", userController.UpdateUser)
 }

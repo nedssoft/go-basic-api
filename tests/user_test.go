@@ -11,12 +11,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	name  = "Test User"
+	email = "test@example.com"
+)
+
 func TestCreateUser(t *testing.T) {
 	router, _ := SetupTestRouter()
-
 	user := models.User{
-		Name:  "Test User",
-		Email: "test@example.com",
+		Name:  name,
+		Email: email,
 	}
 
 	jsonValue, _ := json.Marshal(user)
@@ -25,20 +29,20 @@ func TestCreateUser(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusCreated, w.Code)
 
-	var response map[string]string
+	var response map[string]models.User
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.Nil(t, err)
-	assert.Equal(t, "User created successfully", response["message"])
+	assert.Equal(t, name, response["user"].Name)
+	assert.Equal(t, email, response["user"].Email)
 }
 
 func TestGetUser(t *testing.T) {
 	router, db := SetupTestRouter()
-
 	user := models.User{
-		Name:  "Test User",
-		Email: "test@example.com",
+		Name:  name,
+		Email: email,
 	}
 	db.Create(&user)
 
@@ -51,8 +55,8 @@ func TestGetUser(t *testing.T) {
 	var response map[string]models.User
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.Nil(t, err)
-	assert.Equal(t, user.Name, response["user"].Name)
-	assert.Equal(t, user.Email, response["user"].Email)
+	assert.Equal(t, name, response["user"].Name)
+	assert.Equal(t, email, response["user"].Email)
 }
 
 func TestGetNonExistentUser(t *testing.T) {
@@ -69,3 +73,55 @@ func TestGetNonExistentUser(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "Failed to get user", response["error"])
 }
+
+func TestDeleteUser(t *testing.T) {
+	router, db := SetupTestRouter()
+
+	// Create a test user
+	testUser := models.User{Name: name, Email: email}
+	db.Create(&testUser)
+
+	req, _ := http.NewRequest("DELETE", "/api/v1/users/1", nil)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var response map[string]string
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+
+	assert.Equal(t, "User deleted", response["message"])
+
+	// Check if the user was deleted
+	var deletedUser models.User
+	db.First(&deletedUser, 1)
+	assert.Equal(t, uint(0), deletedUser.ID)
+}
+
+func TestUpdateUser(t *testing.T) {
+	router, db := SetupTestRouter()
+
+	// Create a test user
+	testUser := models.User{Name: name, Email: email}
+	db.Create(&testUser)
+
+
+	updatedUser := models.User{Name: "Updated User", Email: "updated@example.com"}
+	jsonValue, _ := json.Marshal(updatedUser)
+	req, _ := http.NewRequest("PUT", "/api/v1/users/1", bytes.NewBufferString(string(jsonValue)))
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var response map[string]models.User
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+
+	assert.Equal(t, "Updated User", response["user"].Name)
+	assert.Equal(t, "updated@example.com", response["user"].Email)
+}
+

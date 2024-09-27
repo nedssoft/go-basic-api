@@ -21,5 +21,6 @@ func Migrate(db *gorm.DB) error {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Migration completed")
 	return nil
 }

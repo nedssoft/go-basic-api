@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nedssoft/go-basic-api/models"
 	"github.com/nedssoft/go-basic-api/service"
 	"gorm.io/gorm"
+	"github.com/nedssoft/go-basic-api/data/requests"
 )
 
 type PostController struct {
@@ -21,13 +21,13 @@ func NewPostController(db *gorm.DB) *PostController {
 }
 
 func (c *PostController) CreatePost(gn *gin.Context) {
-	var post *models.Post
+	var post requests.PostPayload
 	if err := gn.ShouldBindJSON(&post); err != nil {
 		log.Println(err)
 		gn.JSON(http.StatusBadRequest, gin.H{"error": "Failed to bind JSON"})
 		return
 	}
-	if err := c.PostService.CreatePost(post); err != nil {
+	if err := c.PostService.CreatePost(&post); err != nil {
 		log.Println(err)
 		gn.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create post"})
 		return
@@ -54,4 +54,30 @@ func (c *PostController) GetPosts(gn *gin.Context) {
 		return
 	}
 	gn.JSON(http.StatusOK, gin.H{"posts": posts})
+}
+
+func (c *PostController) DeletePost(gn *gin.Context) {
+	id := gn.Param("id")
+	if err := c.PostService.DeletePost(id); err != nil {
+		log.Println(err)
+		gn.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete post"})
+		return
+	}
+	gn.JSON(http.StatusOK, gin.H{"message": "Post deleted"})
+}
+
+func (c *PostController) UpdatePost(gn *gin.Context) {
+	id := gn.Param("id")
+	var post *requests.PostPayload
+	if err := gn.ShouldBindJSON(&post); err != nil {
+		log.Println(err)
+		gn.JSON(http.StatusBadRequest, gin.H{"error": "Failed to extract post payload"})
+		return
+	}
+	if err := c.PostService.UpdatePost(id, post); err != nil {
+		log.Println(err)
+		gn.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update post"})
+		return
+	}
+	gn.JSON(http.StatusOK, gin.H{"post": post})
 }
