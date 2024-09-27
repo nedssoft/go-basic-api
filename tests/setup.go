@@ -2,8 +2,8 @@ package tests
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nedssoft/learn-go/models"
-	"github.com/nedssoft/learn-go/routes"
+	"github.com/nedssoft/go-basic-api/models"
+	"github.com/nedssoft/go-basic-api/routes"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )

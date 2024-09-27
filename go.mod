@@ -1,4 +1,4 @@
-module github.com/nedssoft/learn-go
+module github.com/nedssoft/go-basic-api
 
 go 1.23.1
 

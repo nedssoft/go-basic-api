@@ -3,7 +3,7 @@ package db
 import (
 	"log"
 
-	"github.com/nedssoft/learn-go/models"
+	"github.com/nedssoft/go-basic-api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

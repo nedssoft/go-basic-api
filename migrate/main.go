@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	"github.com/nedssoft/learn-go/config"
-	"github.com/nedssoft/learn-go/models"
+	database "github.com/nedssoft/go-basic-api/bin/db"
+	"github.com/nedssoft/go-basic-api/config"
+	"github.com/nedssoft/go-basic-api/models"
 	"gorm.io/gorm"
-	database "github.com/nedssoft/learn-go/bin/db"
 )
 
 func Migrate(db *gorm.DB) error {
@@ -21,7 +21,7 @@ func Migrate(db *gorm.DB) error {
 func main() {
 	db, err := database.NewDB(config.GetConnectionString())
 	if err != nil {
-	 log.Fatal(err)
+		log.Fatal(err)
 	} else {
 		log.Println("Connected to database")
 		Migrate(db)

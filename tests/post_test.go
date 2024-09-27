@@ -7,10 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/nedssoft/learn-go/models"
+	"github.com/nedssoft/go-basic-api/models"
 	"github.com/stretchr/testify/assert"
 )
-
 
 func TestCreatePost(t *testing.T) {
 	router, _ := SetupTestRouter()

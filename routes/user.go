@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"github.com/nedssoft/learn-go/models"
-	"github.com/nedssoft/learn-go/service"
+	"github.com/nedssoft/go-basic-api/models"
+	"github.com/nedssoft/go-basic-api/service"
 )
 
 type UserRoutes struct {

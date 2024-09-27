@@ -1,26 +1,26 @@
 package service
 
 import (
-	"github.com/nedssoft/learn-go/models"
+	"github.com/nedssoft/go-basic-api/models"
 	"gorm.io/gorm"
 )
 
 type UserService struct {
-  db *gorm.DB
+	db *gorm.DB
 }
 
 func NewUserService(db *gorm.DB) *UserService {
-  return &UserService{db: db}
+	return &UserService{db: db}
 }
 
 func (s *UserService) CreateUser(user *models.User) error {
-  return s.db.Create(user).Error
+	return s.db.Create(user).Error
 }
 
 func (s *UserService) GetUser(id string) (*models.User, error) {
-  var user models.User
-  if err := s.db.Preload("Posts").First(&user, id).Error; err != nil {
-    return nil, err
-  }
-  return &user, nil
+	var user models.User
+	if err := s.db.Preload("Posts").First(&user, id).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

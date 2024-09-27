@@ -1,21 +1,20 @@
 package routes
 
 import (
-
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"github.com/nedssoft/learn-go/controllers"
+	"github.com/nedssoft/go-basic-api/controllers"
 )
 
 type PostRoutes struct {
-	db *gorm.DB
+	db     *gorm.DB
 	router gin.RouterGroup
 }
 
 func NewPostRoutes(router *gin.RouterGroup, db *gorm.DB) *PostRoutes {
 	return &PostRoutes{
-	  db:     db,
+		db:     db,
 		router: *router,
 	}
 }
