@@ -37,7 +37,7 @@ func TestCreatePost(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, w.Code)
 
-	var response map[string]requests.PostPayload
+	var response map[string]responses.PostResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.Equal(t, postTitle, response["post"].Title)
@@ -141,5 +141,4 @@ func TestUpdatePost(t *testing.T) {
 
 	assert.Equal(t, "Updated Post", response["post"].Title)
 	assert.Equal(t, "This is an updated post", response["post"].Body)
-	assert.Equal(t, uint(1), response["post"].UserID)
 }

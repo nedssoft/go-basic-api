@@ -1,10 +1,13 @@
 package service
 
 import (
+
 	"github.com/nedssoft/go-basic-api/data/requests"
 	"github.com/nedssoft/go-basic-api/data/responses"
 	"github.com/nedssoft/go-basic-api/models"
 	"gorm.io/gorm"
+  "time"
+  "github.com/nedssoft/go-basic-api/utils"
 )
 
 type PostService struct {
@@ -15,13 +18,25 @@ func NewPostService(db *gorm.DB) *PostService {
 	return &PostService{db: db}
 }
 
-func (s *PostService) CreatePost(payload *requests.PostPayload) error {
+func (s *PostService) CreatePost(payload *requests.PostPayload) (postResponse *responses.PostResponse, err error) {
 	post := models.Post{
 		Title:  payload.Title,
 		Body:   payload.Body,
 		UserID: payload.UserID,
 	}
-	return s.db.Model(&models.Post{}).Create(&post).Error
+	result := s.db.Create(&post)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+  now := time.Now()
+	return &responses.PostResponse{
+		ID: post.ID,
+		Title: post.Title,
+		Body: post.Body,
+		UserID: post.UserID,
+		CreatedAt: utils.DefaultValue(post.CreatedAt, &now),
+		UpdatedAt: utils.DefaultValue(post.UpdatedAt, &now),
+	}, nil
 }
 
 func (s *PostService) GetPost(id string) (*responses.PostResponse, error) {
@@ -44,11 +59,10 @@ func (s *PostService) DeletePost(id string) error {
 	return s.db.Delete(&models.Post{}, id).Error
 }
 
-func (s *PostService) UpdatePost(id string, payload *requests.PostPayload) error {
+func (s *PostService) UpdatePost(id string, payload *requests.PostUpdatePayload) error {
 	post := models.Post{
 		Title:  payload.Title,
 		Body:   payload.Body,
-		UserID: payload.UserID,
 	}
 	return s.db.Model(&models.Post{}).Where("id = ?", id).Updates(&post).Error
 }

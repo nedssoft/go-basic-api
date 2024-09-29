@@ -13,7 +13,7 @@ func SetupTestRouter() (*gin.Engine, *gorm.DB) {
 	router := gin.Default()
 
 	// Use in-memory SQLite for testing
-	db, _ := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	db, _ := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{ SkipDefaultTransaction: true,})
 	database.Migrate(db)
 
 	api := router.Group("/api/v1")

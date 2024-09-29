@@ -24,15 +24,15 @@ func (c *UserController) CreateUser(gn *gin.Context) {
 	var user *requests.UserPayload
 	if err := gn.ShouldBindJSON(&user); err != nil {
 		log.Println(err)
-		gn.JSON(http.StatusBadRequest, gin.H{"error": "Failed to extract user payload"})
+		gn.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := c.UserService.CreateUser(user); err != nil {
-		log.Println(err)
-		gn.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+	newUser, err := c.UserService.CreateUser(user)
+	if  err != nil {
+		gn.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	gn.JSON(http.StatusCreated, gin.H{"user": user})
+	gn.JSON(http.StatusCreated, gin.H{"user": newUser})
 }
 
 func (c *UserController) GetUser(gn *gin.Context) {
@@ -68,7 +68,7 @@ func (c *UserController) DeleteUser(gn *gin.Context) {
 
 func (c *UserController) UpdateUser(gn *gin.Context) {
 	id := gn.Param("id")
-	var user *requests.UserPayload
+	var user *requests.UserUpdatePayload
 	if err := gn.ShouldBindJSON(&user); err != nil {
 		log.Println(err)
 		gn.JSON(http.StatusBadRequest, gin.H{"error": "Failed to extract user payload"})

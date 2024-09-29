@@ -9,11 +9,13 @@ import (
 
 	"github.com/nedssoft/go-basic-api/models"
 	"github.com/stretchr/testify/assert"
+	"github.com/nedssoft/go-basic-api/data/responses"
 )
 
 const (
 	name  = "Test User"
 	email = "test@example.com"
+	password = "password$123"
 )
 
 func TestCreateUser(t *testing.T) {
@@ -21,6 +23,7 @@ func TestCreateUser(t *testing.T) {
 	user := models.User{
 		Name:  name,
 		Email: email,
+		Password: password,
 	}
 
 	jsonValue, _ := json.Marshal(user)
@@ -31,7 +34,7 @@ func TestCreateUser(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, w.Code)
 
-	var response map[string]models.User
+	var response map[string]responses.UserResponse
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	assert.Nil(t, err)
 	assert.Equal(t, name, response["user"].Name)
@@ -43,6 +46,7 @@ func TestGetUser(t *testing.T) {
 	user := models.User{
 		Name:  name,
 		Email: email,
+		Password: password,
 	}
 	db.Create(&user)
 
@@ -78,7 +82,7 @@ func TestDeleteUser(t *testing.T) {
 	router, db := SetupTestRouter()
 
 	// Create a test user
-	testUser := models.User{Name: name, Email: email}
+	testUser := models.User{Name: name, Email: email, Password: password}
 	db.Create(&testUser)
 
 	req, _ := http.NewRequest("DELETE", "/api/v1/users/1", nil)
@@ -103,11 +107,11 @@ func TestUpdateUser(t *testing.T) {
 	router, db := SetupTestRouter()
 
 	// Create a test user
-	testUser := models.User{Name: name, Email: email}
+	testUser := models.User{Name: name, Email: email, Password: password}
 	db.Create(&testUser)
 
 
-	updatedUser := models.User{Name: "Updated User", Email: "updated@example.com"}
+	updatedUser := models.User{Name: "Updated User"}
 	jsonValue, _ := json.Marshal(updatedUser)
 	req, _ := http.NewRequest("PUT", "/api/v1/users/1", bytes.NewBufferString(string(jsonValue)))
 	req.Header.Set("Content-Type", "application/json")
@@ -122,6 +126,5 @@ func TestUpdateUser(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, "Updated User", response["user"].Name)
-	assert.Equal(t, "updated@example.com", response["user"].Email)
 }
 

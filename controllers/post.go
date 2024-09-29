@@ -22,17 +22,18 @@ func NewPostController(db *gorm.DB) *PostController {
 
 func (c *PostController) CreatePost(gn *gin.Context) {
 	var post requests.PostPayload
-	if err := gn.ShouldBindJSON(&post); err != nil {
+	if err := gn.BindJSON(&post); err != nil {
 		log.Println(err)
-		gn.JSON(http.StatusBadRequest, gin.H{"error": "Failed to bind JSON"})
+		gn.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := c.PostService.CreatePost(&post); err != nil {
+	postResponse, err := c.PostService.CreatePost(&post)
+	if err != nil {
 		log.Println(err)
 		gn.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create post"})
 		return
 	}
-	gn.JSON(http.StatusCreated, gin.H{"post": post})
+	gn.JSON(http.StatusCreated, gin.H{"post": postResponse})
 }
 
 func (c *PostController) GetPost(gn *gin.Context) {
@@ -68,10 +69,10 @@ func (c *PostController) DeletePost(gn *gin.Context) {
 
 func (c *PostController) UpdatePost(gn *gin.Context) {
 	id := gn.Param("id")
-	var post *requests.PostPayload
-	if err := gn.ShouldBindJSON(&post); err != nil {
+	var post *requests.PostUpdatePayload
+	if err := gn.BindJSON(&post); err != nil {
 		log.Println(err)
-		gn.JSON(http.StatusBadRequest, gin.H{"error": "Failed to extract post payload"})
+		gn.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if err := c.PostService.UpdatePost(id, post); err != nil {

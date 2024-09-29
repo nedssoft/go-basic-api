@@ -21,9 +21,6 @@ func NewAPIServer(addr string, db *gorm.DB) *APIServer {
 
 func (s *APIServer) Run() error {
 	router := gin.Default()
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
-	router.Use(gin.ErrorLogger())
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "Hello World",

@@ -15,12 +15,22 @@ func NewUserService(db *gorm.DB) *UserService {
 	return &UserService{db: db}
 }
 
-func (s *UserService) CreateUser(payload *requests.UserPayload) error {
+func (s *UserService) CreateUser(payload *requests.UserPayload) (userResponse *responses.UserResponse, err error) {
 	user := models.User{
 		Name: payload.Name,
 		Email: payload.Email,
 	}
-	return s.db.Model(&models.User{}).Create(&user).Error
+	result := s.db.Create(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &responses.UserResponse{
+		ID: user.ID,
+		Name: user.Name,
+		Email: user.Email,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}, nil
 }
 
 func (s *UserService) GetUser(id string) (*responses.UserPostsResponse, error) {
@@ -63,6 +73,6 @@ func (s *UserService) DeleteUser(id string) error {
 	return s.db.Delete(&models.User{}, id).Error
 }
 
-func (s *UserService) UpdateUser(id string, user *requests.UserPayload) error {
+func (s *UserService) UpdateUser(id string, user *requests.UserUpdatePayload) error {
 	return s.db.Model(&models.User{}).Where("id = ?", id).Updates(user).Error
 }

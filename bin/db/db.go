@@ -9,7 +9,7 @@ import (
 )
 
 func NewDB(connString string) (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open(connString), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(connString), &gorm.Config{  SkipDefaultTransaction: true})
 	if err != nil {
 		log.Fatal(err)
 	}
