@@ -23,4 +23,7 @@ func (r *Routes) RegisterRoutes() {
 
 	userRoutes := NewUserRoutes(&r.router, r.db)
 	userRoutes.RegisterRoutes()
+
+	authRoutes := NewAuthRoutes(&r.router, r.db)
+	authRoutes.RegisterRoutes()
 }

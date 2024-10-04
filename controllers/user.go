@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,8 +22,12 @@ func NewUserController(db *gorm.DB) *UserController {
 func (c *UserController) CreateUser(gn *gin.Context) {
 	var user *requests.UserPayload
 	if err := gn.ShouldBindJSON(&user); err != nil {
-		log.Println(err)
+
 		gn.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := user.HashPassword(); err != nil {
+		gn.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
 		return
 	}
 	newUser, err := c.UserService.CreateUser(user)
@@ -39,7 +42,6 @@ func (c *UserController) GetUser(gn *gin.Context) {
 	id := gn.Param("id")
 	user, err := c.UserService.GetUser(id)
 	if err != nil {
-		log.Println(err)
 		gn.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
 		return
 	}
@@ -49,7 +51,6 @@ func (c *UserController) GetUser(gn *gin.Context) {
 func (c *UserController) GetUsers(gn *gin.Context) {
 	users, err := c.UserService.GetUsers()
 	if err != nil {
-		log.Println(err)
 		gn.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get users"})
 		return
 	}
@@ -59,7 +60,6 @@ func (c *UserController) GetUsers(gn *gin.Context) {
 func (c *UserController) DeleteUser(gn *gin.Context) {
 	id := gn.Param("id")
 	if err := c.UserService.DeleteUser(id); err != nil {
-		log.Println(err)
 		gn.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
 		return
 	}
@@ -70,12 +70,10 @@ func (c *UserController) UpdateUser(gn *gin.Context) {
 	id := gn.Param("id")
 	var user *requests.UserUpdatePayload
 	if err := gn.ShouldBindJSON(&user); err != nil {
-		log.Println(err)
 		gn.JSON(http.StatusBadRequest, gin.H{"error": "Failed to extract user payload"})
 		return
 	}
 	if err := c.UserService.UpdateUser(id, user); err != nil {
-		log.Println(err)
 		gn.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
 		return
 	}

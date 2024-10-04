@@ -1,6 +1,7 @@
 package service
 
 import (
+
 	"github.com/nedssoft/go-basic-api/data/requests"
 	"github.com/nedssoft/go-basic-api/data/responses"
 	"github.com/nedssoft/go-basic-api/models"
@@ -19,6 +20,7 @@ func (s *UserService) CreateUser(payload *requests.UserPayload) (userResponse *r
 	user := models.User{
 		Name: payload.Name,
 		Email: payload.Email,
+		Password: payload.Password,
 	}
 	result := s.db.Create(&user)
 	if result.Error != nil {
@@ -75,4 +77,20 @@ func (s *UserService) DeleteUser(id string) error {
 
 func (s *UserService) UpdateUser(id string, user *requests.UserUpdatePayload) error {
 	return s.db.Model(&models.User{}).Where("id = ?", id).Updates(user).Error
+}
+
+func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
+	if err := s.db.Model(&models.User{}).Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (s *UserService) GetUserById(id uint) (*models.User, error) {
+	var user models.User
+	if err := s.db.Model(&models.User{}).Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

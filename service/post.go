@@ -18,11 +18,11 @@ func NewPostService(db *gorm.DB) *PostService {
 	return &PostService{db: db}
 }
 
-func (s *PostService) CreatePost(payload *requests.PostPayload) (postResponse *responses.PostResponse, err error) {
+func (s *PostService) CreatePost(payload *requests.PostPayload,userId uint) (postResponse *responses.PostResponse, err error) {
 	post := models.Post{
 		Title:  payload.Title,
 		Body:   payload.Body,
-		UserID: payload.UserID,
+		UserID: userId,
 	}
 	result := s.db.Create(&post)
 	if result.Error != nil {
@@ -55,14 +55,15 @@ func (s *PostService) GetPosts() ([]responses.PostResponse, error) {
 	return posts, nil
 }
 
-func (s *PostService) DeletePost(id string) error {
+func (s *PostService) DeletePost(id uint) error {
 	return s.db.Delete(&models.Post{}, id).Error
 }
 
-func (s *PostService) UpdatePost(id string, payload *requests.PostUpdatePayload) error {
+func (s *PostService) UpdatePost(id string, payload *requests.PostUpdatePayload, userId uint) error {
 	post := models.Post{
 		Title:  payload.Title,
 		Body:   payload.Body,
 	}
-	return s.db.Model(&models.Post{}).Where("id = ?", id).Updates(&post).Error
+	return s.db.Model(&models.Post{}).Where("id = ?", id).Where("user_id = ?", userId).Updates(&post).Error
 }
+
